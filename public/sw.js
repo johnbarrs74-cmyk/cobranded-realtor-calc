@@ -1,5 +1,5 @@
-const CACHE = 'sfp-v1';
-const STATIC = ['/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/favicon-32.png', '/favicon-16.png', '/manifest.json'];
+const CACHE = 'sfp-v3';
+const STATIC = ['/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/favicon-32.png', '/favicon-16.png'];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -17,12 +17,17 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
-  // Never cache API or HTML — always go to network for fresh content
-  if (url.pathname.startsWith('/api/') || e.request.mode === 'navigate' ||
-      e.request.headers.get('accept')?.includes('text/html')) {
+  // NEVER cache: API, HTML navigations, manifest, service worker, or text/html requests
+  if (
+    url.pathname.startsWith('/api/') ||
+    url.pathname === '/manifest.json' ||
+    url.pathname === '/sw.js' ||
+    e.request.mode === 'navigate' ||
+    (e.request.headers.get('accept') || '').includes('text/html')
+  ) {
     return;
   }
-  // Cache-first for static assets (images, JS, CSS)
+  // Cache-first for static images, JS, CSS only
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
       if (res.ok && res.type === 'basic') {
