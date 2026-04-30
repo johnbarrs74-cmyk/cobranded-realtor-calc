@@ -18,10 +18,13 @@ async function fetchRealtor(slug) {
   try {
     const r = await fetch(
       `${GH_API}/repos/${OWNER}/${REPO}/contents/data/realtors/${encodeURIComponent(slug)}.json?ref=${BRANCH}`,
-      { headers: { Authorization: `Bearer ${TOKEN}`, Accept: 'application/vnd.github.raw' } }
+      { headers: { Authorization: `Bearer ${TOKEN}`, Accept: 'application/vnd.github+json' } }
     );
     if (!r.ok) return null;
-    return JSON.parse(await r.text());
+    const j = await r.json();
+    if (!j.content) return null;
+    const decoded = Buffer.from(j.content, 'base64').toString('utf-8');
+    return JSON.parse(decoded);
   } catch { return null; }
 }
 
