@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Co-branded mortgage calculator from your trusted realtor and Service First Property Group." />
+        <meta name="theme-color" content="#0f172a" />
+    <link rel="manifest" href="/manifest.json" id="pwa-manifest" />
+    <script>
+      // Personalize PWA manifest per-realtor based on URL path so home-screen install
+      // launches the correct calculator (not the generic /).
+      (function () {
+        try {
+          var seg = location.pathname.replace(/^\/+/, "").split("/")[0];
+          if (seg && seg !== "api") {
+            var link = document.getElementById("pwa-manifest");
+            if (link) link.href = "/api/manifest?slug=" + encodeURIComponent(seg);
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Mortgage Calc" />
+    <title>Co-Branded Mortgage Calculator</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+  </body>
+</html>
